@@ -1,0 +1,122 @@
+table Date
+	lineageTag: 6449ebb4-707d-4137-9b2c-c86de0aadbeb
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: yyyy-mm-dd
+		lineageTag: 13da4ffa-f700-4e64-b1b9-3757dc4ddeb5
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Date]
+
+	column Year
+		dataType: int64
+		lineageTag: 202f6700-f489-4996-9084-50332b7d8377
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year]
+
+	column Quarter
+		dataType: string
+		lineageTag: ef8dfee3-794a-46ed-9961-64c8f5677403
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Quarter]
+
+	column 'Month Number'
+		dataType: int64
+		lineageTag: 7f8844ab-51ac-4ba5-ae54-bd1143b3d76f
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month Number]
+
+	column Month
+		dataType: string
+		lineageTag: ec65e866-8fe7-4457-93fc-60b794275b27
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Month]
+		sortByColumn: 'Month Number'
+
+	column 'Year Month Number'
+		dataType: int64
+		lineageTag: 2061f8b1-7b27-4099-b1eb-1a4295d90f06
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year Month Number]
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: b403affe-12d0-4a12-95e0-9f442038b8ab
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Year Month]
+		sortByColumn: 'Year Month Number'
+
+	column Day
+		dataType: int64
+		lineageTag: 81d9a4e7-a642-4bd7-9b1d-ab21bd2ae274
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day]
+
+	column 'Day of Week Number'
+		dataType: int64
+		lineageTag: 33a75fda-5183-4ffe-9d72-ca80da23937a
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day of Week Number]
+
+	column 'Day of Week'
+		dataType: string
+		lineageTag: 71f322bc-cae1-48c2-ad06-b62422cbe4bc
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Day of Week]
+		sortByColumn: 'Day of Week Number'
+
+	column 'Is Weekend'
+		dataType: boolean
+		lineageTag: 85bc93dd-a6bf-42b2-abb2-49cfc462c4a4
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Is Weekend]
+
+	column 'Month Short' = FORMAT('Date'[Date], "mmm")
+		dataType: string
+		lineageTag: d7a5fd44-22cf-4331-b9d4-f52f742de10e
+		summarizeBy: none
+		sortByColumn: 'Month Number'
+
+	partition Date = calculated
+		source =
+				VAR StartDate = MIN(flights[FLIGHT_DATE])
+				VAR EndDate = MAX(flights[FLIGHT_DATE])
+				RETURN
+				ADDCOLUMNS(
+				    CALENDAR(StartDate, EndDate),
+				    "Year", YEAR([Date]),
+				    "Quarter", "Q" & QUARTER([Date]),
+				    "Month Number", MONTH([Date]),
+				    "Month", FORMAT([Date], "mmmm"),
+				    "Year Month Number", YEAR([Date]) * 100 + MONTH([Date]),
+				    "Year Month", FORMAT([Date], "yyyy-mm"),
+				    "Day", DAY([Date]),
+				    "Day of Week Number", WEEKDAY([Date], 2),
+				    "Day of Week", FORMAT([Date], "dddd"),
+				    "Is Weekend", WEEKDAY([Date], 2) >= 6
+				)
+

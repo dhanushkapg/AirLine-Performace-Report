@@ -1,0 +1,27 @@
+table airlines
+	lineageTag: 30097445-d08e-4681-b540-8670c889dd9b
+
+	column IATA_CODE
+		dataType: string
+		lineageTag: 3f689fa6-91f4-4309-bd74-9185b5198543
+		summarizeBy: none
+		sourceColumn: IATA_CODE
+
+	column AIRLINE
+		dataType: string
+		lineageTag: 79eecb53-5b0f-413b-b6ed-a3c25ecaf9fd
+		summarizeBy: none
+		sourceColumn: AIRLINE
+
+	partition airlines = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\Study\PowerBI Projects\Analytics with Claude\archive\airlines.csv"), [Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"IATA_CODE", type text}, {"AIRLINE", type text}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

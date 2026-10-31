@@ -1,0 +1,15 @@
+table 'Delay Cause'
+	lineageTag: 36e06f54-e4b0-4246-a9a1-eb2f1c66475f
+
+	column Cause
+		dataType: string
+		lineageTag: 587899fa-3860-4873-9f5b-8a13ad7f4cff
+		summarizeBy: none
+		isNameInferred
+		isDataTypeInferred
+		sourceColumn: [Cause]
+
+	partition 'Delay Cause' = calculated
+		mode: import
+		source = DATATABLE("Cause", STRING, {{"Late aircraft"}, {"Airline"}, {"Air system"}, {"Weather"}, {"Security"}})
+

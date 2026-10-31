@@ -1,0 +1,267 @@
+table flights
+	lineageTag: 7821d3fa-b97f-4ad3-b69d-957a29753855
+
+	measure 'Total Flights' = COUNTROWS(flights)
+		formatString: #,0
+		lineageTag: 6e9f9edc-5b99-43b8-b681-f31db4faea67
+
+	measure 'Completed Flights' = COUNT(flights[ARRIVAL_DELAY])
+		formatString: #,0
+		lineageTag: 3f136d60-e65f-43f0-8e26-c1ce75432631
+
+	measure 'Delayed Flights' = CALCULATE(COUNTROWS(flights), flights[ARRIVAL_DELAY] >= 15)
+		formatString: #,0
+		lineageTag: b240a294-1dc5-49b2-bb6f-d38a3f6e44c1
+
+	measure 'Delay Rate' = DIVIDE([Delayed Flights], [Completed Flights])
+		formatString: 0.0%
+		lineageTag: 21247d76-5288-4a9a-bbd1-3301710a9b73
+
+	measure 'Avg Delay When Late' = CALCULATE(AVERAGE(flights[ARRIVAL_DELAY]), flights[ARRIVAL_DELAY] >= 15)
+		formatString: 0.0
+		lineageTag: 8508ab63-8b0b-4447-adf8-fbccc032d6e8
+
+	measure 'Severe Delays 60+ Min' = CALCULATE(COUNTROWS(flights), flights[ARRIVAL_DELAY] >= 60)
+		formatString: #,0
+		lineageTag: e6fa2f22-1135-44fe-a7d2-ba10b451fa27
+
+	measure 'Cancelled Flights' = SUM(flights[CANCELLED])
+		formatString: #,0
+		lineageTag: e4cbacc4-892e-4811-a1ba-2a8f1f7ba9a4
+
+	measure 'Cancellation Rate' = DIVIDE([Cancelled Flights], [Total Flights])
+		formatString: 0.0%
+		lineageTag: 29392cbe-030b-49c0-8390-bfec7b70eaf3
+
+	measure 'Delay Minutes by Cause' = SWITCH(SELECTEDVALUE('Delay Cause'[Cause]), "Late aircraft", SUM(flights[LATE_AIRCRAFT_DELAY]), "Airline", SUM(flights[AIRLINE_DELAY]), "Air system", SUM(flights[AIR_SYSTEM_DELAY]), "Weather", SUM(flights[WEATHER_DELAY]), "Security", SUM(flights[SECURITY_DELAY]))
+		formatString: #,0
+		lineageTag: 67cdb472-acf6-4654-be7a-12eda4bdfe2f
+
+	measure 'Destination Delayed Flights' = CALCULATE([Delayed Flights], USERELATIONSHIP(flights[DESTINATION_AIRPORT], airports[IATA_CODE]))
+		formatString: #,0
+		lineageTag: e36104ce-76d4-4603-92f5-d7ac2794c387
+
+	measure 'Top 15 Origin Delayed' = IF(NOT ISBLANK(SELECTEDVALUE(airports[AIRPORT])) && RANKX(FILTER(ALLSELECTED(airports), NOT ISBLANK(airports[AIRPORT])), [Delayed Flights]) <= 15, [Delayed Flights])
+		formatString: #,0
+		lineageTag: c9f517b0-56c4-42bd-a3ef-3a7ad9c1d9cf
+
+	measure 'Top 15 Destination Delayed' = IF(NOT ISBLANK(SELECTEDVALUE(airports[AIRPORT])) && RANKX(FILTER(ALLSELECTED(airports), NOT ISBLANK(airports[AIRPORT])), [Destination Delayed Flights]) <= 15, [Destination Delayed Flights])
+		formatString: #,0
+		lineageTag: 96609022-9467-4b86-abf5-8b1f9fd3d613
+
+	measure 'Top 15 Origin Delay Rate' = IF(NOT ISBLANK([Top 15 Origin Delayed]), [Delay Rate])
+		formatString: 0.0%
+		lineageTag: 25673566-8608-4b4d-824e-7fcf0ef51fe8
+
+	measure 'Top 15 Origin Flights' = IF(NOT ISBLANK([Top 15 Origin Delayed]), [Completed Flights])
+		formatString: #,0
+		lineageTag: 4bca7ce3-86a1-43c9-829d-324ea42971a3
+
+	measure 'Completed Flights_new' = CALCULATE(COUNTROWS(flights),flights[DIVERTED]=0,flights[CANCELLED]=0)
+		formatString: 0
+		lineageTag: 82829133-750f-4a36-8077-3baef1b4b462
+
+	column YEAR
+		dataType: int64
+		lineageTag: 17f850ae-f2e2-4671-badd-c36c6528e8e3
+		summarizeBy: none
+		sourceColumn: YEAR
+
+	column MONTH
+		dataType: int64
+		lineageTag: c292f519-1f03-470e-9920-907f563135c2
+		summarizeBy: none
+		sourceColumn: MONTH
+
+	column DAY
+		dataType: int64
+		lineageTag: a6148fba-3cec-4a23-bb11-13a665d0d538
+		summarizeBy: none
+		sourceColumn: DAY
+
+	column DAY_OF_WEEK
+		dataType: int64
+		lineageTag: f6d2318b-34d7-41e0-bda7-f9edcc6668ba
+		summarizeBy: none
+		sourceColumn: DAY_OF_WEEK
+
+	column AIRLINE
+		dataType: string
+		lineageTag: c276c642-a68a-4811-998d-8cb03dd7a41b
+		summarizeBy: none
+		sourceColumn: AIRLINE
+
+	column FLIGHT_NUMBER
+		dataType: int64
+		lineageTag: 2375c8d1-322d-4ed0-b166-c147360e002a
+		summarizeBy: none
+		sourceColumn: FLIGHT_NUMBER
+
+	column TAIL_NUMBER
+		dataType: string
+		lineageTag: e4656705-38de-4841-8efd-c9964eb7fb16
+		summarizeBy: none
+		sourceColumn: TAIL_NUMBER
+
+	column ORIGIN_AIRPORT
+		dataType: string
+		lineageTag: 0ce18be2-318d-4025-81f3-1622de782869
+		summarizeBy: none
+		sourceColumn: ORIGIN_AIRPORT
+
+	column DESTINATION_AIRPORT
+		dataType: string
+		lineageTag: b02399d1-6b8c-4aad-ad19-2517ba9bf453
+		summarizeBy: none
+		sourceColumn: DESTINATION_AIRPORT
+
+	column SCHEDULED_DEPARTURE
+		dataType: string
+		lineageTag: 7a8dd5a4-462a-429f-a3b5-c00871d69a89
+		summarizeBy: none
+		sourceColumn: SCHEDULED_DEPARTURE
+
+	column DEPARTURE_TIME
+		dataType: string
+		lineageTag: fee3edea-93e9-4213-95b6-6359e78fc579
+		summarizeBy: none
+		sourceColumn: DEPARTURE_TIME
+
+	column DEPARTURE_DELAY
+		dataType: int64
+		lineageTag: e7894000-8993-4bbd-b0c4-67e91bc0287b
+		summarizeBy: none
+		sourceColumn: DEPARTURE_DELAY
+
+	column TAXI_OUT
+		dataType: int64
+		lineageTag: 16b69b4e-bc2e-47a5-b7a1-4aa1e24bb2fb
+		summarizeBy: none
+		sourceColumn: TAXI_OUT
+
+	column WHEELS_OFF
+		dataType: string
+		lineageTag: e075f4e4-f203-44d8-a89d-60fd1b7328d8
+		summarizeBy: none
+		sourceColumn: WHEELS_OFF
+
+	column SCHEDULED_TIME
+		dataType: int64
+		lineageTag: af6292b6-f72f-4389-b5e3-e451144202c6
+		summarizeBy: none
+		sourceColumn: SCHEDULED_TIME
+
+	column ELAPSED_TIME
+		dataType: int64
+		lineageTag: e183f0c8-def2-49fe-ab0a-d9009f952338
+		summarizeBy: none
+		sourceColumn: ELAPSED_TIME
+
+	column AIR_TIME
+		dataType: int64
+		lineageTag: 41c38f52-d3e9-40d8-8c20-1a45fba5f839
+		summarizeBy: none
+		sourceColumn: AIR_TIME
+
+	column DISTANCE
+		dataType: int64
+		lineageTag: 9f98a1fc-a301-47ed-bfc8-1b59727d36a8
+		summarizeBy: none
+		sourceColumn: DISTANCE
+
+	column WHEELS_ON
+		dataType: string
+		lineageTag: 4cbc8207-c8a3-4718-a79c-0c263a0e697a
+		summarizeBy: none
+		sourceColumn: WHEELS_ON
+
+	column TAXI_IN
+		dataType: int64
+		lineageTag: e44ae659-bbad-408b-a688-2ff858a3e319
+		summarizeBy: none
+		sourceColumn: TAXI_IN
+
+	column SCHEDULED_ARRIVAL
+		dataType: string
+		lineageTag: b8dc0de4-54cd-4a81-882a-de0abf1d6d3e
+		summarizeBy: none
+		sourceColumn: SCHEDULED_ARRIVAL
+
+	column ARRIVAL_TIME
+		dataType: string
+		lineageTag: 10f0edd0-30f1-462d-831b-a77efc0b3ffd
+		summarizeBy: none
+		sourceColumn: ARRIVAL_TIME
+
+	column ARRIVAL_DELAY
+		dataType: int64
+		lineageTag: 0e85ce77-dbe6-4f00-86bc-3aac2e6f35b9
+		summarizeBy: none
+		sourceColumn: ARRIVAL_DELAY
+
+	column DIVERTED
+		dataType: int64
+		lineageTag: c0aed0d1-b5cc-4c47-9481-3b09e895ec5e
+		summarizeBy: none
+		sourceColumn: DIVERTED
+
+	column CANCELLED
+		dataType: int64
+		lineageTag: 16e68323-bd4f-482c-b140-eaa40a39d8ad
+		summarizeBy: none
+		sourceColumn: CANCELLED
+
+	column CANCELLATION_REASON
+		dataType: string
+		lineageTag: 8de363ac-c4de-4b24-86da-c24791cf0ebf
+		summarizeBy: none
+		sourceColumn: CANCELLATION_REASON
+
+	column AIR_SYSTEM_DELAY
+		dataType: int64
+		lineageTag: 642ce883-7228-4242-bc32-ab18892db205
+		summarizeBy: none
+		sourceColumn: AIR_SYSTEM_DELAY
+
+	column SECURITY_DELAY
+		dataType: int64
+		lineageTag: cccb4834-4cf5-41ea-88b1-f02e3ebe5ab1
+		summarizeBy: none
+		sourceColumn: SECURITY_DELAY
+
+	column AIRLINE_DELAY
+		dataType: int64
+		lineageTag: 2cd0258e-974d-4a14-826f-e97ddf83c125
+		summarizeBy: none
+		sourceColumn: AIRLINE_DELAY
+
+	column LATE_AIRCRAFT_DELAY
+		dataType: int64
+		lineageTag: 212c78e5-b309-4db9-8202-84fda440506f
+		summarizeBy: none
+		sourceColumn: LATE_AIRCRAFT_DELAY
+
+	column WEATHER_DELAY
+		dataType: int64
+		lineageTag: ecd30a4f-5d8f-4bad-bbab-3fca14ecac6e
+		summarizeBy: none
+		sourceColumn: WEATHER_DELAY
+
+	column FLIGHT_DATE = DATE(flights[YEAR], flights[MONTH], flights[DAY])
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: d4ab5792-4bae-4e05-bc69-0fa20f03ad24
+		summarizeBy: none
+
+	partition flights = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\Study\PowerBI Projects\Analytics with Claude\archive\flights.csv"), [Delimiter=",", Columns=31, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"YEAR", Int64.Type}, {"MONTH", Int64.Type}, {"DAY", Int64.Type}, {"DAY_OF_WEEK", Int64.Type}, {"AIRLINE", type text}, {"FLIGHT_NUMBER", Int64.Type}, {"TAIL_NUMBER", type text}, {"ORIGIN_AIRPORT", type text}, {"DESTINATION_AIRPORT", type text}, {"SCHEDULED_DEPARTURE", type text}, {"DEPARTURE_TIME", type text}, {"DEPARTURE_DELAY", Int64.Type}, {"TAXI_OUT", Int64.Type}, {"WHEELS_OFF", type text}, {"SCHEDULED_TIME", Int64.Type}, {"ELAPSED_TIME", Int64.Type}, {"AIR_TIME", Int64.Type}, {"DISTANCE", Int64.Type}, {"WHEELS_ON", type text}, {"TAXI_IN", Int64.Type}, {"SCHEDULED_ARRIVAL", type text}, {"ARRIVAL_TIME", type text}, {"ARRIVAL_DELAY", Int64.Type}, {"DIVERTED", Int64.Type}, {"CANCELLED", Int64.Type}, {"CANCELLATION_REASON", type text}, {"AIR_SYSTEM_DELAY", Int64.Type}, {"SECURITY_DELAY", Int64.Type}, {"AIRLINE_DELAY", Int64.Type}, {"LATE_AIRCRAFT_DELAY", Int64.Type}, {"WEATHER_DELAY", Int64.Type}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

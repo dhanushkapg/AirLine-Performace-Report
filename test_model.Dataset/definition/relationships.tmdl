@@ -1,0 +1,17 @@
+relationship flights_airline
+	fromColumn: flights.AIRLINE
+	toColumn: airlines.IATA_CODE
+
+relationship flights_origin
+	fromColumn: flights.ORIGIN_AIRPORT
+	toColumn: airports.IATA_CODE
+
+relationship flights_destination
+	isActive: false
+	fromColumn: flights.DESTINATION_AIRPORT
+	toColumn: airports.IATA_CODE
+
+relationship flights_date
+	fromColumn: flights.FLIGHT_DATE
+	toColumn: Date.Date
+

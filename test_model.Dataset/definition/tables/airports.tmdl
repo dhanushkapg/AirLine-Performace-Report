@@ -1,0 +1,57 @@
+table airports
+	lineageTag: e2f40eb9-e078-4397-b856-9e0d1db8d370
+
+	column IATA_CODE
+		dataType: string
+		lineageTag: 471f3ac9-77d2-417a-b73e-7e9e33c32e8c
+		summarizeBy: none
+		sourceColumn: IATA_CODE
+
+	column AIRPORT
+		dataType: string
+		lineageTag: 6a1c3363-e555-433f-87be-f8485d81f4e5
+		summarizeBy: none
+		sourceColumn: AIRPORT
+
+	column CITY
+		dataType: string
+		lineageTag: da3f5d0f-fb75-4693-a6c9-0e9818bd345f
+		summarizeBy: none
+		sourceColumn: CITY
+
+	column STATE
+		dataType: string
+		lineageTag: 828b7a22-b21b-499f-8dc4-a58528857c46
+		summarizeBy: none
+		sourceColumn: STATE
+
+	column COUNTRY
+		dataType: string
+		lineageTag: 5c5a14fd-7aa5-4c20-9174-fb45b1854c78
+		summarizeBy: none
+		sourceColumn: COUNTRY
+
+	column LATITUDE
+		dataType: double
+		lineageTag: 1477c2e9-0645-45f5-a39b-2be39f586ac4
+		summarizeBy: none
+		sourceColumn: LATITUDE
+
+	column LONGITUDE
+		dataType: double
+		lineageTag: b6bcd678-96af-416c-861a-fc1ffd2fc582
+		summarizeBy: none
+		sourceColumn: LONGITUDE
+
+	partition airports = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("D:\Study\PowerBI Projects\Analytics with Claude\archive\airports.csv"), [Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"IATA_CODE", type text}, {"AIRPORT", type text}, {"CITY", type text}, {"STATE", type text}, {"COUNTRY", type text}, {"LATITUDE", type number}, {"LONGITUDE", type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+
